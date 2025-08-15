@@ -1,0 +1,12 @@
+# Virtual environment
+venv/
+env/ 
+
+
+# Git
+.git
+.gitignore
+
+# Local build artifacts
+*.log
+*.sqlite3
