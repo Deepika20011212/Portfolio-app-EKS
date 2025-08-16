@@ -15,8 +15,8 @@ spec:
         app: todo-eks
     spec:
       containers:
-      - name: {{ .Values.image.repository }}
-        image: {{ .Values.image.tag }}
+      - name: todo-cont
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         ports:
         - containerPort: 5000
 
