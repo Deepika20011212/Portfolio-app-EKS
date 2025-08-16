@@ -3,11 +3,11 @@ on:
   push:
     branches:
       - main
+
 jobs:
 
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -22,11 +22,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-   
   sonarqube:
     runs-on: ubuntu-latest
     needs: build
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -43,7 +41,6 @@ jobs:
   push-to-ecr:
     runs-on: ubuntu-latest
     needs: sonarqube
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -53,7 +50,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-south-1   # change region if needed
+        aws-region: ap-south-1
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -71,36 +68,56 @@ jobs:
   trivy-scan:
     runs-on: ubuntu-latest
     needs: push-to-ecr
-
     steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.12.0
       with:
-        image-ref: ${{ steps.login-ecr.outputs.registry }}/todo:${{ github.run_id }}
+        image-ref: "${{ steps.login-ecr.outputs.registry }}/todo:${{ github.run_id }}"
         format: 'table'
-        exit-code: '1'   # Fail pipeline on HIGH/CRITICAL
+        exit-code: '1'
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
 
   update-helm:
     runs-on: ubuntu-latest
     needs: trivy-scan
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.TOKEN }}
 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
     - name: Update tag in Helm chart
       run: |
-        sed -i 's|tag: .*|tag: "${{ github.run_id }}"|'  helm-chart/values.yaml
+        sed -i 's|tag: .*|tag: "'"${{ github.run_id }}"'"|' helm-chart/values.yaml
         sed -i 's|repository: .*|repository: '"${{ steps.login-ecr.outputs.registry }}/todo"'|' helm-chart/values.yaml
 
     - name: Commit and Push changes
       run: |
-        git config --global user.email "rdeepika121201@gmail.com@gmail.com"
+        git config --global user.email "rdeepika121201@gmail.com"
         git config --global user.name "Deepika20011212"
         git add helm-chart/values.yaml
-        git commit -m "Update Helm chart with new ECR image ${{ github.run_id }}"
+        git commit -m "Update Helm chart with new ECR image ${{ github.run_id }}" || echo "No changes to commit"
         git push
