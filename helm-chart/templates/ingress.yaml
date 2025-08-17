@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: todo-eks-ingress
+  name: portfolio-eks-ingress
 spec:
   ingressClassName: nginx
   rules:
-  - host: "todo-eks.com"
+  - host: "deepika.com"
     http:
       paths:
       - pathType: Prefix
