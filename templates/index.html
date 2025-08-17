@@ -1,101 +1,43 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>To-Do App</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-      font-family: "Segoe UI", sans-serif;
-    }
-    .todo-card {
-      max-width: 650px;
-      margin: auto;
-    }
-    .card {
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .card-body {
-      padding: 2rem;
-    }
-    h2 {
-      font-weight: bold;
-      color: #333;
-    }
-    .form-control {
-      border-radius: 12px;
-    }
-    .btn {
-      border-radius: 12px;
-      transition: all 0.3s ease;
-    }
-    .btn:hover {
-      transform: scale(1.05);
-    }
-    .list-group-item {
-      border-radius: 12px;
-      margin-bottom: 10px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .completed {
-      text-decoration: line-through;
-      color: gray;
-    }
-    .btn-group form {
-      display: inline;
-    }
+    body { background: #f5f7fa; }
+    .todo-card { max-width: 650px; margin: auto; }
+    .completed { text-decoration: line-through; color: gray; }
   </style>
 </head>
 <body>
   <div class="container py-5">
     <div class="todo-card">
-      <h2 class="text-center mb-4">📝 My Todo List</h2>
-      <div class="card shadow-lg">
+      <h2 class="text-center mb-4">📝 My Todo List App</h2>
+      <div class="card shadow">
         <div class="card-body">
-          <!-- Add Task Form -->
           <form action="/add" method="post" class="d-flex mb-4">
-            <input type="text" name="content" class="form-control me-2" placeholder="✍️ Add a new task..." required>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-plus-lg"></i> Add
-            </button>
+            <input type="text" name="content" class="form-control me-2" placeholder="Add a new task..." required>
+            <button type="submit" class="btn btn-primary">Add</button>
           </form>
 
-          <!-- If no tasks -->
           {% if todos|length == 0 %}
-          <p class="text-center text-muted">🎉 No tasks yet! Add one above.</p>
+          <p class="text-center text-muted">No tasks yet!</p>
           {% endif %}
 
-          <!-- Task List -->
           <ul class="list-group">
             {% for todo in todos %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="{% if todo['completed'] %}completed{% endif %}">
-                {{ todo['content'] }}
-              </span>
+              <span class="{% if todo['completed'] %}completed{% endif %}">{{ todo['content'] }}</span>
               <div class="btn-group">
-                <!-- Toggle Complete -->
                 <form action="/toggle/{{ todo['id'] }}" method="post">
                   <button type="submit" class="btn btn-sm {% if todo['completed'] %}btn-secondary{% else %}btn-success{% endif %}">
-                    {% if todo['completed'] %}
-                      <i class="bi bi-arrow-counterclockwise"></i> Undo
-                    {% else %}
-                      <i class="bi bi-check-lg"></i> Done
-                    {% endif %}
+                    {% if todo['completed'] %}Undo{% else %}Done{% endif %}
                   </button>
                 </form>
-                <!-- Edit -->
-                <a href="/edit/{{ todo['id'] }}" class="btn btn-sm btn-warning">
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-                <!-- Delete -->
-                <a href="/delete/{{ todo['id'] }}" class="btn btn-sm btn-danger">
-                  <i class="bi bi-trash"></i>
-                </a>
+                <a href="/edit/{{ todo['id'] }}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="/delete/{{ todo['id'] }}" class="btn btn-sm btn-danger">Delete</a>
               </div>
             </li>
             {% endfor %}
