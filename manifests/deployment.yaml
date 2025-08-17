@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-eks-deploy
+  name: portfolio-eks-deploy
   labels:
     app: todo-eks
 spec:
@@ -15,8 +15,8 @@ spec:
         app: todo-eks
     spec:
       containers:
-      - name: todo-eks-cont
-        image: itdeepikar747/eks-todo
+      - name: todo-cont
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         ports:
         - containerPort: 5000
 

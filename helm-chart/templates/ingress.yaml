@@ -12,8 +12,8 @@ spec:
         path: "/"
         backend:
           service:
-            name: todo-eks-service
+            name: portfolio-eks-service
             port:
-              number: 5000
+              number: 80
   
 
