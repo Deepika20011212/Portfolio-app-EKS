@@ -54,3 +54,6 @@ cd Portfolio-app-EKS
 ```bash
 eksctl create cluster --name demo-cluster --region us-east-1
 ```
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/dfc0da1e-751d-47c0-a7f5-30f2812c087d" />
+
